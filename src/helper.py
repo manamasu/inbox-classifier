@@ -56,3 +56,10 @@ def clean_text(text):
     cleaned_text = re.sub(r"\s+", " ", cleaned_text).strip()
 
     return cleaned_text
+
+
+def get_or_create_subfolder(parent_folder, subfolder_name):
+    try:
+        return parent_folder.Folders[subfolder_name]
+    except Exception:
+        return parent_folder.Folders.Add(subfolder_name)
