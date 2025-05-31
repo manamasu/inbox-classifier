@@ -1,11 +1,6 @@
 import win32com.client
 import pandas as pd
-import re
-
-
-def clean_text(text):
-    """Clean the text by removing excessive whitespace and newlines."""
-    return re.sub(r"\s+", " ", text).strip()
+from helper import clean_text, extract_links
 
 
 # This script scrapes emails from the Outlook inbox and saves them to a CSV file.
@@ -30,21 +25,27 @@ def scrape_emails(max_emails=10):
             body = msg.Body or ""
             sender = msg.SenderName or ""
             received = msg.ReceivedTime or ""
-            content = clean_text(subject + "\n" + body)
+            full_text = subject + "\n" + body
+            content = clean_text(full_text)
+
+            links, domains = extract_links(full_text)
 
             data.append(
                 {
                     "Subject": subject,
                     "From": sender,
                     "Received": received,
-                    "Content": content,  # TODO: links take up a lot of space, so we need to transform the *content* and remove
-                    "Label": "",  # <- Placeholder for labels, need to be adjusted later
+                    "Domains": "; ".join(domains),
+                    "Content": content,
+                    "RawLinks": "; ".join(links),
+                    "Label": "",  # <- Placeholder for labels
                 }
             )
 
             count += 1
             if count >= max_emails:
                 break
+
         except Exception as e:
             print("Error reading message:", e)
             continue
