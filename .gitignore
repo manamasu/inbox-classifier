@@ -35,6 +35,9 @@ Thumbs.db
 
 
 # Project-specific
-emails_scraped.csv
+*.csv
 data/
 models/
+
+# For now:
+spam_classifier.*
