@@ -38,6 +38,5 @@ Thumbs.db
 *.csv
 data/
 models/
+spam_classifier.ipynb
 
-# For now:
-spam_classifier.*
