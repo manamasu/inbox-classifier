@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from email_utils import fetch_emails
 from helper import get_or_create_subfolder
@@ -12,8 +13,12 @@ def classify_and_move_emails(max_emails, output_csv):
 
     outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
     inbox = outlook.GetDefaultFolder(6)  # Inbox
-    spam_folder = get_or_create_subfolder(inbox, "Spam_pred")
-    job_folder = get_or_create_subfolder(inbox, "Job_pred")
+    spam_folder = get_or_create_subfolder(
+        inbox, "Spam_pred"
+    )  # Can be any subfolder name you want
+    job_folder = get_or_create_subfolder(
+        inbox, "Job_pred"
+    )  # Can be any subfolder name you want
 
     classified_data = []
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -42,9 +47,18 @@ def classify_and_move_emails(max_emails, output_csv):
         del email["msg_obj"]
         classified_data.append(email)
 
+    if not classified_data:
+        print("No emails to classify.")
+        return
+
+    # Have to ensure the data directory exists, can be changed to any directory you want
+    if not os.path.exists(os.getcwd() + "/data"):
+        os.makedirs(os.getcwd() + "/data")
+
+    output_csv = os.path.join(os.getcwd(), "data", output_csv)
     # Save classification results to a CSV file
     df = pd.DataFrame(classified_data)
-    df.to_csv(output_csv, index=False)
+    df.to_csv(output_csv, mode="a", index=False, header=not os.path.exists(output_csv))
     print(f"Classified and moved {len(df)} emails. Saved to '{output_csv}'.")
 
 
